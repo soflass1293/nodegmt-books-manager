@@ -1,0 +1,12 @@
+{
+  "name": "nodegmt-books-manager",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/soflass1293/nodegmt-books-manager.git",
+  "author": "Sofienne LASSOUED <soflass1293@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "node dist/index.js",
+    "dev": "nodemon src/index.ts"
+  }
+}
