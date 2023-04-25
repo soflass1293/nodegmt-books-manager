@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Library Management App</title>
+  </head>
+  <body>
+    <h1>Library Management App</h1>
+
+    <h2>Authors</h2>
+    <ul id="authorsList"></ul>
+    <form id="addAuthorForm">
+      <input
+        type="text"
+        id="authorNameInput"
+        placeholder="Author name"
+        required
+      />
+      <button type="submit">Add Author</button>
+    </form>
+
+    <h2>Books</h2>
+    <ul id="booksList"></ul>
+    <form id="addBookForm">
+      <input
+        type="text"
+        id="bookTitleInput"
+        placeholder="Book title"
+        required
+      />
+      <select id="bookAuthorSelect" required></select>
+      <select id="bookCategorySelect" required></select>
+      <button type="submit">Add Book</button>
+    </form>
+
+    <h2>Categories</h2>
+    <ul id="categoriesList"></ul>
+    <form id="addCategoryForm">
+      <input
+        type="text"
+        id="categoryNameInput"
+        placeholder="Category name"
+        required
+      />
+      <button type="submit">Add Category</button>
+    </form>
+
+    <script>
+      // Define API base URL
+      const BASE_URL = "http://localhost:3000"; // Replace with your backend API URL
+
+      // Fetch data and update UI
+      const fetchDataAndUpdateUI = () => {
+        // Fetch authors
+        fetch(`${BASE_URL}/authors`)
+          .then((response) => response.json())
+          .then((authors) => {
+            const authorsList = document.getElementById("authorsList");
+            authorsList.innerHTML = "";
+            authors.forEach((author) => {
+              const li = document.createElement("li");
+              li.textContent = author.name;
+              authorsList.appendChild(li);
+            });
+
+            // Fetch books
+            fetch(`${BASE_URL}/books`)
+              .then((response) => response.json())
+              .then((books) => {
+                const booksList = document.getElementById("booksList");
+                booksList.innerHTML = "";
+                books.forEach((book) => {
+                  const li = document.createElement("li");
+                  li.textContent = `${book.title} (Author: ${book.author.name}, Category: ${book.category.name})`;
+                  booksList.appendChild(li);
+                });
+
+                // Fetch categories
+                fetch(`${BASE_URL}/categories`)
+                  .then((response) => response.json())
+                  .then((categories) => {
+                    const categoriesList =
+                      document.getElementById("categoriesList");
+                    categoriesList.innerHTML = "";
+                    categories.forEach((category) => {
+                      const li = document.createElement("li");
+                      li.textContent = category.name;
+                      categoriesList.appendChild(li);
+                    });
+
+                    // Update book author and category select options
+                    const bookAuthorSelect =
+                      document.getElementById("bookAuthorSelect");
+                    const bookCategorySelect =
+                      document.getElementById("bookCategorySelect");
+                    bookAuthorSelect.innerHTML = "";
+                    bookCategorySelect.innerHTML = "";
+                    authors.forEach((author) => {
+                      const option = document.createElement("option");
+                      option.value = author._id;
+                      option.textContent = author.name;
+                      bookAuthorSelect.appendChild(option);
+                    });
+                    categories.forEach((category) => {
+                      const option = document.createElement("option");
+                      option.value = category._id;
+                      option.textContent = category.name;
+                      bookCategorySelect.appendChild(option);
+                    });
+                  });
+              });
+          });
+      };
+
+      // Add author form submit event handler
+      document
+        .getElementById("addAuthorForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const authorNameInput = document.getElementById("authorNameInput");
+          const authorName = authorNameInput.value;
+          if (authorName) {
+            // Make a POST request to create a new author
+            fetch(`${BASE_URL}/authors`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name: authorName }),
+            })
+              .then((response) => response.json())
+              .then((author) => {
+                // Update UI with the newly created author
+                const authorsList = document.getElementById("authorsList");
+                const li = document.createElement("li");
+                li.textContent = author.name;
+                authorsList.appendChild(li);
+                authorNameInput.value = "";
+              });
+          }
+        });
+
+      // Add book form submit event handler
+      document
+        .getElementById("addBookForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const bookTitleInput = document.getElementById("bookTitleInput");
+          const bookAuthorSelect = document.getElementById("bookAuthorSelect");
+          const bookCategorySelect =
+            document.getElementById("bookCategorySelect");
+          const bookTitle = bookTitleInput.value;
+          const bookAuthorId = bookAuthorSelect.value;
+          const bookCategoryId = bookCategorySelect.value;
+          if (bookTitle && bookAuthorId && bookCategoryId) {
+            // Make a POST request to create a new book
+            fetch(`${BASE_URL}/books`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                title: bookTitle,
+                authorId: bookAuthorId,
+                categoryId: bookCategoryId,
+              }),
+            })
+              .then((response) => response.json())
+              .then((book) => {
+                // Update UI with the newly created book
+                const booksList = document.getElementById("booksList");
+                const li = document.createElement("li");
+                li.textContent = `${book.title} (Author: ${book.author.name}, Category: ${book.category.name})`;
+                booksList.appendChild(li);
+                bookTitleInput.value = "";
+              });
+          }
+        });
+
+      // Add category form submit event handler
+      document
+        .getElementById("addCategoryForm")
+        .addEventListener("submit", (event) => {
+          event.preventDefault();
+          const categoryNameInput =
+            document.getElementById("categoryNameInput");
+          const categoryName = categoryNameInput.value;
+          if (categoryName) {
+            // Make a POST request to create a new category
+            fetch(`${BASE_URL}/categories`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name: categoryName }),
+            })
+              .then((response) => response.json())
+              .then((category) => {
+                // Update UI with the newly created category
+                const categoriesList =
+                  document.getElementById("categoriesList");
+                const li = document.createElement("li");
+                li.textContent = category.name;
+                categoriesList.appendChild(li);
+                categoryNameInput.value = "";
+              });
+          }
+        });
+
+      // Fetch initial data and update UI
+      fetchDataAndUpdateUI();
+    </script>
+  </body>
+</html>
